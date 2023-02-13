@@ -19,21 +19,35 @@
             <div class="product-info">
                 <h1>{{ product }}</h1>
                 <!-- <p v-if="inStock">In Stock</p> -->
-                <p v-if="inventory > 10">In Stock</p>
-                <p v-else-if="inventory <= 10 && inventory > 0">Almost sold out!</p>
-                <p v-else="inventory">Out of Stock</p>
-                <span v-show="OnSale && inventory > 0">On Sale</span> 
+                <p v-if="inventory > 10">В наличии: {{inventory}} товаров</p>
+                <p v-else-if="inventory <= 10 && inventory > 0">Почти распроданно : {{inventory}} товаров</p>
+                <p v-else="inventory">Нет в наличии</p>
+                <span v-show="OnSale && inventory > 0">Скидка</span> 
                 <p>Состав:</p>
+
                 <ul>
                      <li v-for="detail in details"> {{ detail }}</li>  <!-- v-for - перебирает массив -->
                  </ul>
+
                  <p>Размеры:</p>
+
                  <ul>
                     <li v-for="size in sizes "> {{ size }}</li>
                 </ul>
+
                  <div v-for="variant in variants" :key="variant.variantId">
-                    <p>Цвет: {{ variant.variantColor }}</p>
+                     <p @mouseover="updateProduct(variant.variantImage)"> <!-- @ = v-on -->
+                       Цвет: {{ variant.variantColor }}
+                    </p>
                  </div>
+
+                 <div class="cart">
+                    <p>Товаров в корзине: {{ cart }}</p>
+                    <button @click ="deleteFromCart(cart)">Удалить товар</button>
+                 </div>
+
+                <button @click="addToCart(cart)">Add to cart</button>
+                 
             </div>
         </div>
      </div>
