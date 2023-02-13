@@ -4,7 +4,7 @@ let app = new Vue({
         product: "Socks",
         image: "./assets/vmSocks-green-onWhite.jpg",
         altText: "A pair of socks",
-        inStock: false, 
+        // inStock: false, 
         inventory: 12,
         OnSale: true,
         details: ['80% cotton', '20% polyester', 'Gender-neutral'],
@@ -14,23 +14,14 @@ let app = new Vue({
         cart: 1,
 
              addToCart() {
-                if(this.inventory <= 0)
-                    alert("Товар закончился")
-                else{
                     this.cart += 1
                     this.inventory -= 1
-                 }
-
              } ,
 
             deleteFromCart() {
-                if(this.cart <= 0)
-                    alert("Корзина пуста")
-                else{
                 this.cart -= 1
                 this.inventory += 1
-                }
-            },
+                },
 
             updateProduct(variantImage) {
                 this.image = variantImage

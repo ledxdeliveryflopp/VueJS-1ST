@@ -21,7 +21,7 @@
                 <!-- <p v-if="inStock">In Stock</p> -->
                 <p v-if="inventory > 10">В наличии: {{inventory}} товаров</p>
                 <p v-else-if="inventory <= 10 && inventory > 0">Почти распроданно : {{inventory}} товаров</p>
-                <p v-else="inventory">Нет в наличии</p>
+                <p :class="{ OutOfInventory: inventory <= 0 }" v-else="inventory">Нет в наличии</p>
                 <span v-show="OnSale && inventory > 0">Скидка</span> 
                 <p>Состав:</p>
 
@@ -35,19 +35,21 @@
                     <li v-for="size in sizes "> {{ size }}</li>
                 </ul>
 
-                 <div v-for="variant in variants" :key="variant.variantId">
-                     <p @mouseover="updateProduct(variant.variantImage)"> <!-- @ = v-on -->
-                       Цвет: {{ variant.variantColor }}
-                    </p>
-                 </div>
+                <div
+                class="color-box"
+                v-for="variant in variants"
+                :key="variant.variantId"
+                 :style="{ backgroundColor:variant.variantColor }"    
+                @mouseover="updateProduct(variant.variantImage)">  <!-- @ = v-on -->
+                </div>
 
                  <div class="cart">
                     <p>Товаров в корзине: {{ cart }}</p>
-                    <button @click ="deleteFromCart(cart)">Удалить товар</button>
+                    <button :disabled="cart <= 0" :class="{ disabledButton: cart <= 0 }" @click ="deleteFromCart(cart)">Удалить товар</button>
+                    
                  </div>
 
-                <button @click="addToCart(cart)">Add to cart</button>
-                 
+                <button :disabled="inventory <= 0" :class="{ disabledButton: inventory <= 0 }" @click="addToCart(cart)">Добавить в корзину</button>
             </div>
         </div>
      </div>
