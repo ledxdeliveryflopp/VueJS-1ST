@@ -5,30 +5,29 @@ let eventBus = new Vue()
 Vue.component('product', {
     template: `
         <div class="product">
-        <div class="product-image">
-            <img :src="image" :alt="altText"/>
-        </div>
-        <div class="product-info">
-            <h1>{{ title }}</h1>
-            <!-- <p v-if="inStock">In Stock</p> -->
-            <p v-if="inventory > 10">В наличии: {{inventory}} товаров</p>
-            <p v-else-if="inventory <= 10 && inventory > 0">Почти распроданно : {{inventory}} товаров</p>
-            <p :class="{ OutOfInventory: inventory <= 0 }" v-else="inventory">Нет в наличии</p>
-            <span v-show="OnSale && inventory > 0">{{ Sale }}</span> 
-            <p>Состав:</p>
-            <product-details></product-details>
-            <p>Размеры:</p>
-            <ul>
-                <li v-for="size in sizes "> {{ size }}</li>
-            </ul>
-            <div
-            
-            class="color-box"
-            v-for="(variant, index) in variants"
-            :key="variant.variantId"
-            :style="{ backgroundColor:variant.variantColor }"    
-            @mouseover="updateProduct(index)">  <!-- @ = v-on -->
+            <div class="product-image">
+                <img :src="image" :alt="altText"/>
             </div>
+                <div class="product-info">
+                        <h1>{{ title }}</h1>
+                        <p v-if="inventory > 10">В наличии: {{inventory}} товаров</p>
+                        <p v-else-if="inventory <= 10 && inventory > 0">Почти распроданно : {{inventory}} товаров</p>
+                        <p :class="{ OutOfInventory: inventory <= 0 }" v-else="inventory">Нет в наличии</p>
+                        <span v-show="OnSale && inventory > 0">{{ Sale }}</span> 
+                        <p>Состав:</p>
+                        <product-details></product-details>
+                        <p>Размеры:</p>
+                        <ul>
+                            <li v-for="size in sizes "> {{ size }}</li>
+                        </ul>
+                        
+                        <div
+                        class="color-box"
+                        v-for="(variant, index) in variants"
+                        :key="variant.variantId"
+                        :style="{ backgroundColor:variant.variantColor }"    
+                        @mouseover="updateProduct(index)">  <!-- @ = v-on -->
+                </div>
 
 
             <div class="cart">
@@ -83,13 +82,13 @@ Vue.component('product', {
             this.selectedVariant = index;
             console.log(index);
         },
-        mounted() {
-            eventBus.$on('review-submitted', productReview => {
-                this.reviews.push(productReview)
-                console.log(productReview)
-            })
-        },
+    },   
+    mounted() {
+        eventBus.$on('review-submitted', productReview => {
+            this.reviews.push(productReview)
+        })
     },
+    
     computed: {
         title() {
             return this.brand + ' ' + this.product;
@@ -202,7 +201,7 @@ Vue.component('product-details', {
                 if (!this.name) this.errors.push("Необходимо название")
                 if (!this.review) this.errors.push("Необходим комментарий")
                 if (!this.rating) this.errors.push("Необходима оценка")
-                if (!this.picked) this.errors.push("Шлепа")
+                if (!this.picked) this.errors.push("необходим выбор")
             }
         },
 
@@ -222,11 +221,11 @@ Vue.component('product-tabs', {
             </span>
        </ul>
 
-       <div v-show="selectedTab === 'Комментарии'">
+       <div v-show="selectedTab == 'Отзывы'">
        
-            <h2>Комментарии</h2>
+            <h2>Отзывы</h2>
             
-            <p v-if="!reviews.length">Их нету :(</p>
+            
                     <ul>
                       <li v-for="review in reviews">
                       <p>Название:{{ review.name }}</p>
@@ -235,8 +234,9 @@ Vue.component('product-tabs', {
                       <span>Вопрос: {{ review.picked }}</span>
                       </li>
                     </ul>
+
         </div>
-            <div v-show="selectedTab === 'Создать комментарий'">
+            <div v-show="selectedTab === 'Оставить отзыв'">
                 <product-review></product-review>
             </div>
         
@@ -244,7 +244,7 @@ Vue.component('product-tabs', {
                 <p>Доставка: {{ shipping }}</p>
             </div>
         
-            <div v-show="selectedTab === 'Описание'">
+            <div v-show="selectedTab === 'Информация'">
                 <product-details/>
             </div>
         
@@ -253,8 +253,8 @@ Vue.component('product-tabs', {
  `,
     data() {
         return {
-            tabs: ['Комментарии', 'Создать комментарий', 'Доставка' , 'Описание'],
-            selectedTab: 'Комментарии'  // устанавливается с помощью @click
+            tabs: ['Отзывы', 'Оставить отзыв', 'Доставка', 'Информация'],
+            selectedTab: 'Отзывы'  // устанавливается с помощью @click
         }
     },
     props: {
@@ -287,13 +287,7 @@ Vue.component('product-tabs', {
     el: '#app', 
     data: {
         premium: true,
-        cart: [],
     },
-    computed: {
-        checkCart() {
-
-        }
-    }
             
  })
  
