@@ -15,18 +15,18 @@ Vue.component('product', {
             <p>Состав:</p>
             <product-details></product-details>
             <p>Размеры:</p>
-
             <ul>
                 <li v-for="size in sizes "> {{ size }}</li>
             </ul>
-                <p>Доставка: {{ shipping }}</p>
             <div
+            
             class="color-box"
             v-for="(variant, index) in variants"
             :key="variant.variantId"
             :style="{ backgroundColor:variant.variantColor }"    
             @mouseover="updateProduct(index)">  <!-- @ = v-on -->
             </div>
+
 
             <div class="cart">
                 <p>Товаров в корзине: {{ cart }}</p>
@@ -35,8 +35,14 @@ Vue.component('product', {
             </div>
 
             <button :disabled="inventory <= 0" :class="{ disabledButton: inventory <= 0 }" @click="addToCart(cart)">Добавить в корзину</button>
+               
+             
+        <product-tabs :reviews="reviews" :premium="premium"></product-tabs>
         </div>
+
     </div>
+
+    
   `,
     data() {
         return {
@@ -44,12 +50,13 @@ Vue.component('product', {
             selectedVariant: 0,
             altText: "A pair of socks",
             brand: 'Vue Mastery',
+            cart: 0,
             OnSale: true,
+            reviews: [],
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             variants: [{variantId: 2234, variantColor: 'green', variantImage: "./assets/vmSocks-green-onWhite.jpg", variantQuantity: 15}, 
                         {variantId: 2235, variantColor: 'blue', variantImage: "./assets/vmSocks-blue-onWhite.jpg", variantQuantity: 5}],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-            cart: 1,
         }
     },
     props: {
@@ -62,7 +69,7 @@ Vue.component('product', {
         addToCart() {
             this.cart += 1
             this.variants[this.selectedVariant].variantQuantity -= 1
-        } ,
+        },
     
         deleteFromCart() {
             this.cart -= 1
@@ -72,7 +79,13 @@ Vue.component('product', {
         updateProduct(index) {
             this.selectedVariant = index;
             console.log(index);
-        }
+        },
+        mounted() {
+            eventBus.$on('review-submitted', productReview => {
+                this.reviews.push(productReview)
+                console.log(productReview)
+            })
+        },
     },
     computed: {
         title() {
@@ -110,10 +123,169 @@ Vue.component('product-details', {
     }
  })
  
+ Vue.component('product-review', {
+    template: `
+    <form class="review-form" @submit.prevent="onSubmit">
+    <p v-if="errors.length">
+      <b>Исправьте ошибки:</b>
+           <ul>
+             <li v-for="error in errors">{{ error }}</li>
+           </ul>
+    </p>
+  
+  <div class="picked">
+  
+  <p>Рекомендовали-бы этот продукт?</p>
+   <input type="radio" id="Yes" value="Yes" name="picked"  v-model="picked" />
+          <label for="Yes">Да</label>
+    <br />
+    <input type="radio" id="No" value="No" name="picked" v-model="picked" />
+          <label for="No">Нет</label>
+    <br />
+  
+  </div>
+  
+   <p>
+     <label for="name">Название:</label>
+     <input id="name" v-model="name" placeholder="name">
+   </p>
+  
+   <p>
+     <label for="review">Комментарий:</label>
+     <textarea id="review" v-model="review"></textarea>
+   </p>
+  
+   <p>
+     <label for="rating">Оценка:</label>
+     <select id="rating" v-model.number="rating">
+       <option>5</option>
+       <option>4</option>
+       <option>3</option>
+       <option>2</option>
+       <option>1</option>
+     </select>
+   </p>
+  
+   <p>
+     <input type="submit" value="Подтвердить"> 
+   </p>
+</form>
+
+  `,
+    data() {
+        return {
+            name: null,
+            review: null,
+            rating: null,
+            errors: [],
+            picked: '',
+        }
+    },
+    methods:{
+        onSubmit() {
+            if (this.name && this.review && this.rating && this.picked) {
+                let productReview = {
+                    name: this.name,
+                    review: this.review,
+                    rating: this.rating,
+                    picked: this.picked
+                }
+                eventBus.$emit('review-submitted', productReview)
+                this.name = null
+                this.review = null
+                this.rating = null
+                this.picked = null
+            } else {
+                if (!this.name) this.errors.push("Необходимо название")
+                if (!this.review) this.errors.push("Необходим комментарий")
+                if (!this.rating) this.errors.push("Необходима оценка")
+                if (!this.picked) this.errors.push("Шлепа")
+            }
+        },
+
+
+    },
+
+})
+
+Vue.component('product-tabs', {
+    template: `
+   <div>   
+       <ul>
+            <span class="tab"
+                :class="{ activeTab: selectedTab === tab }"
+                v-for="(tab, index) in tabs"
+                @click="selectedTab = tab">{{ tab }}
+            </span>
+       </ul>
+
+       <div v-show="selectedTab === 'Комментарии'">
+       
+            <h2>Комментарии</h2>
+            
+            <p v-if="!reviews.length">Их нету :(</p>
+                    <ul>
+                      <li v-for="review in reviews">
+                      <p>Название:{{ review.name }}</p>
+                      <p>Рейтинг: {{ review.rating }}</p>
+                      <p>Комментарий:{{ review.review }}</p>
+                      <span>Вопрос: {{ review.picked }}</span>
+                      </li>
+                    </ul>
+        </div>
+            <div v-show="selectedTab === 'Создать комментарий'">
+                <product-review></product-review>
+            </div>
+        
+            <div v-show="selectedTab === 'Доставка'">
+                <p>Доставка: {{ shipping }}</p>
+            </div>
+        
+            <div v-show="selectedTab === 'Описание'">
+                <product-details/>
+            </div>
+        
+     </div>
+   
+ `,
+    data() {
+        return {
+            tabs: ['Комментарии', 'Создать комментарий', 'Доставка' , 'Описание'],
+            selectedTab: 'Комментарии'  // устанавливается с помощью @click
+        }
+    },
+    props: {
+
+        reviews: {
+            type: Array,
+            required: false,
+            },
+
+        premium: {
+            type: Boolean,
+            required: true
+        }
+    },
+    computed: {
+
+        shipping() {
+            if (this.premium) {
+                return "Бесплатно";
+            } else {
+                return 2.99
+            }
+        }
+    }
+
+})
+
+
  let app = new Vue({
     el: '#app', 
     data: {
-        premium: true
-    }            
+        premium: true,
+        cart: [],
+    },
+            
  })
  
