@@ -1,4 +1,7 @@
 //  Экземпляр Vue —  Этот объект содержит различные свойства и методы, которые дают экземпляру Vue возможность хранить данные и выполнять какие-то действия.
+
+let eventBus = new Vue()
+
 Vue.component('product', {
     template: `
         <div class="product">
@@ -286,6 +289,11 @@ Vue.component('product-tabs', {
         premium: true,
         cart: [],
     },
+    computed: {
+        checkCart() {
+
+        }
+    }
             
  })
  
