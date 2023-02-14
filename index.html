@@ -22,7 +22,7 @@
                 <p v-if="inventory > 10">В наличии: {{inventory}} товаров</p>
                 <p v-else-if="inventory <= 10 && inventory > 0">Почти распроданно : {{inventory}} товаров</p>
                 <p :class="{ OutOfInventory: inventory <= 0 }" v-else="inventory">Нет в наличии</p>
-                <span v-show="OnSale && inventory > 0">Скидка</span> 
+                <span v-show="OnSale && inventory > 0">{{ Sale }}</span> 
                 <p>Состав:</p>
 
                 <ul>
@@ -37,10 +37,10 @@
 
                 <div
                 class="color-box"
-                v-for="variant in variants"
+                v-for="(variant, index) in variants"
                 :key="variant.variantId"
                 :style="{ backgroundColor:variant.variantColor }"    
-                @mouseover="updateProduct(variant.variantImage)">  <!-- @ = v-on -->
+                @mouseover="updateProduct(index)">  <!-- @ = v-on -->
                 </div>
 
                  <div class="cart">
