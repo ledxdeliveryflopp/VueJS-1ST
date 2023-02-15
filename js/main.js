@@ -17,9 +17,10 @@ Vue.component('product', {
                         <p>Состав:</p>
                         <product-details></product-details>
                         <p>Размеры:</p>
-                        <ul>
-                            <li v-for="size in sizes "> {{ size }}</li>
-                        </ul>
+
+                        <select>
+                            <option v-for="size in sizes "> {{ size }}</option>
+                        </select>
                         
                         <div
                         class="color-box"
@@ -200,10 +201,12 @@ Vue.component('product-details', {
                 this.rating = null
                 this.picked = null
             } else {
+                this.errors.length = 0
                 if (!this.name) this.errors.push("Необходимо название")
                 if (!this.review) this.errors.push("Необходим комментарий")
                 if (!this.rating) this.errors.push("Необходима оценка")
                 if (!this.picked) this.errors.push("необходим выбор")
+                
                 
             }
         },
