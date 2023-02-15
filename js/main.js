@@ -190,9 +190,11 @@ Vue.component('product-details', {
                     name: this.name,
                     review: this.review,
                     rating: this.rating,
-                    picked: this.picked
+                    picked: this.picked,
+                    
                 }
                 eventBus.$emit('review-submitted', productReview)
+                this.errors.length = 0
                 this.name = null
                 this.review = null
                 this.rating = null
@@ -202,6 +204,7 @@ Vue.component('product-details', {
                 if (!this.review) this.errors.push("Необходим комментарий")
                 if (!this.rating) this.errors.push("Необходима оценка")
                 if (!this.picked) this.errors.push("необходим выбор")
+                
             }
         },
 
